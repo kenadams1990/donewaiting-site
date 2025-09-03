@@ -1,16 +1,10 @@
-# Files to add
-
-Copy these into your site root. Keep paths exactly as shown.
-
----
-
-## `/examples/original-index.html`
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Open Graph / Twitter -->
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Done Waiting — Protect Our Schools</title>
+<meta name="description" content="Add your name: school shootings are unacceptable. Washington must act." />
 <meta property="og:title" content="Done Waiting — Protect Our Schools" />
 <meta property="og:description" content="Add your name: school shootings are unacceptable. Washington must act." />
 <meta property="og:type" content="website" />
@@ -20,260 +14,73 @@ Copy these into your site root. Keep paths exactly as shown.
 <meta name="twitter:title" content="Done Waiting — Protect Our Schools" />
 <meta name="twitter:description" content="Add your name: school shootings are unacceptable. Washington must act." />
 <meta name="twitter:image" content="https://www.donewaiting.us/assets/og.jpg" />
-
-
-<!-- Icons / PWA basics -->
-<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png" />
-<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16.png" />
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/icon-192.png" />
-<link rel="manifest" href="/assets/site.webmanifest" />
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Not One More — Done Waiting</title>
-  <meta name="description" content="End school shootings. We call on Washington to act now. Add your name." />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0b0b0b;
-      --fg: #f5f5f5;
-      --muted: #b3b3b3;
-      --accent: #e11d48; /* rose-600 */
-      --accent-2: #16a34a; /* green-600 for focus states */
-      --border: #262626;
-      --chip: #171717;
-      /* Mobile-first hero image (portrait) */
-      --hero-img: url('assets/empty-classroom-mobile.jpg');
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--fg);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-    }
-    a { color: inherit; }
-    .wrap { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    .hero { display: grid; gap: 16px; padding: 48px 0 24px; align-items: start; }
-    h1 { font-weight: 800; font-size: clamp(28px, 6vw, 60px); line-height: 1.02; margin: 0; }
-    .muted { color: var(--muted); }
-    .cta-row { display:flex; flex-wrap: wrap; gap: 12px; align-items:center }
-    .btn { appearance:none; border: 1px solid var(--border); background: #111; color: #fff; padding: 12px 18px; border-radius: 10px; cursor: pointer; text-decoration: none; font-weight:600 }
-    .btn-ghost { background: transparent; color: #fff; }
-    .card { background:#0f0f10; border:1px solid var(--border); border-radius: 14px; padding: 16px; }
-    .grid { display:grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-    .grid-1 { grid-template-columns: 1fr; }
-    input, select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #2a2a2a; background:#0c0c0c; color:#fff }
-    .counter { font-weight: 700; }
-    .chips { display:flex; gap:8px; flex-wrap:wrap }
-    .chip { background: var(--chip); border:1px solid var(--border); padding:6px 10px; border-radius:999px; font-size:12px }
-    .footer { padding: 32px 0; font-size: 13px; color: var(--muted); }
-    @media (min-width: 900px) {
-      .hero { grid-template-columns: 1.2fr 1fr; }
-    }
-  </style>
+<style>
+:root{--bg:#0b0b0b;--fg:#f5f5f5;--muted:#b3b3b3;--border:#2a2a2a;--primary:#16a34a;--primary-2:#22c55e;--field:#111111}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+.wrap{max-width:880px;margin:0 auto;padding:24px}
+.hero{padding:36px 0 16px}
+h1{font-size:clamp(32px,6vw,56px);line-height:1.05;margin:0 0 8px}
+.muted{color:var(--muted)}
+.counter{font-weight:700}
+form{margin-top:8px}
+label{display:block}
+input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--field);color:#fff;font-size:16px}
+.grid{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+.grid-1{grid-template-columns:1fr}
+.row{display:flex;gap:8px;align-items:center}
+.btn{appearance:none;border:0;border-radius:12px;padding:14px 18px;font-weight:700;cursor:pointer}
+.btn-primary{background:linear-gradient(180deg,var(--primary-2),var(--primary));color:#fff;box-shadow:0 6px 20px #16a34a33}
+.btn-outline{background:transparent;border:1px solid #ffffff33;color:#fff}
+.btn:focus{outline:2px solid #22c55e66;outline-offset:2px}
+.why{margin-top:28px}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero">
-      <div>
-        <h1>Not one more.</h1>
-        <p class="muted">End school shootings. Add your name to urge Washington to act. This is a broad call. No politics. Just urgency.</p>
-        <p class="muted">Signatures so far: <span id="counter" class="counter">—</span></p>
-        <div class="cta-row">
-          <a class="btn" href="#sign">Sign now</a>
-          <a class="btn btn-ghost" href="#learn">Learn more</a>
-        </div>
-        <div class="chips" style="margin-top:10px">
-          <span class="chip">Parents</span><span class="chip">Teachers</span><span class="chip">Students</span><span class="chip">All of us</span>
-        </div>
-      </div>
-      <div class="card">
-        <img src="assets/empty-classroom-mobile.jpg" alt="Empty classroom" style="width:100%; border-radius:10px" />
-      </div>
-    </section>
+<div class="wrap">
+<section class="hero" aria-label="Call to action">
+<h1>School shootings are unacceptable. Washington must act.</h1>
+<p class="muted">Add your name. Broad tent. No politics. Just a clear ask to start the national process.</p>
+<p class="muted">Takes ~15–20 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
+<p><a class="btn btn-outline" href="/examples/original-index.html" rel="noopener">For example: see the original page</a></p>
+</section>
 
-    <section id="sign" class="card">
-      <form id="petitionForm" method="POST" action="https://api.donewaiting.us/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
-        <div class="grid">
-          <label>
-            ZIP Code
-            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}" required placeholder="12345">
-          </label>
-          <label>
-            Email <span class="muted">(optional)</span>
-            <input name="email" type="email" placeholder="you@example.com">
-          </label>
-        </div>
-        <div class="grid">
-          <label>
-            Name <span class="muted">(optional)</span>
-            <input name="name" type="text" placeholder="Jane Doe">
-          </label>
-          <label>
-            Role
-            <select name="role">
-              <option value="citizen">Citizen</option>
-              <option value="parent">Parent</option>
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
-            </select>
-          </label>
-        </div>
-        <label style="display:flex; align-items:center; gap:8px">
-          <input type="checkbox" id="anon" name="anonymous" value="1" checked>
-          <span class="muted">Sign anonymously</span>
-        </label>
-        <button class="btn" type="submit">Sign the petition</button>
-      </form>
-    </section>
 
-    <section id="learn" class="footer">
-      <p>We’re uniting around one simple truth: kids should be safe at school. This shouldn’t be controversial. We’re asking Washington to start a national process in good faith. That’s it.</p>
-    </section>
-  </div>
+<section aria-label="Sign the petition">
+<form id="petitionForm" method="POST" action="/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
+<div class="grid">
+<label>ZIP Code
+<input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}" required placeholder="12345" aria-label="ZIP code" />
+</label>
+<label>Email <span class="muted">(optional)</span>
+<input name="email" type="email" placeholder="you@example.com" />
+</label>
+</div>
+<div class="grid">
+<label>Name <span class="muted">(optional)</span>
+<input name="name" type="text" placeholder="Jane Doe" />
+</label>
+<label>Role
+<select name="role">
+<option value="citizen">Citizen</option>
+<option value="parent">Parent</option>
+<option value="teacher">Teacher</option>
+<option value="student">Student</option>
+</select>
+</label>
+</div>
+<div class="row">
+<label class="row" style="gap:6px"><input type="checkbox" id="anon" name="anonymous" value="1" checked> Sign anonymously</label>
+<span class="muted">We never show your email.</span>
+</div>
+<button class="btn btn-primary" type="submit" aria-label="Sign the petition now">Sign in 1 step</button>
+</form>
+</section>
 
-  <script>
-    async function fetchCount(retries = 2) {
-      const counter = document.getElementById('counter');
-      try {
-        const res = await fetch('/api/count', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Bad status ' + res.status);
-        const data = await res.json();
-        const n = (data && typeof data.count === 'number') ? data.count : 0;
-        counter.textContent = new Intl.NumberFormat().format(n);
-      } catch (err) {
-        if (retries > 0) return fetchCount(retries - 1);
-        counter.textContent = '—';
-      }
-    }
-    fetchCount();
 
-    document.getElementById('anon').addEventListener('change', (e) => {
-      const form = document.getElementById('petitionForm');
-      let hidden = form.querySelector('input[name="anonymous"][type="hidden"]');
-      if (!hidden) { hidden = document.createElement('input'); hidden.type = 'hidden'; hidden.name = 'anonymous'; form.appendChild(hidden); }
-      hidden.value = e.target.checked ? '1' : '0';
-    });
-  </script>
-</body>
+<section class="why" aria-label="Why this matters">
+<h2>Why this matters</h2>
+<p class="muted">No stump speeches. No culture‑war bait. Kids should be safe at school. That shouldn’t be controversial.</p>
+</section>
 </html>
-```
-
-> The block above wraps your original HTML verbatim so it renders at `/examples/original-index.html`. I did not change its copy or URLs.
-
----
-
-## `/index.html` (new index with a secondary “For example” button)
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Done Waiting — Protect Our Schools</title>
-  <meta name="description" content="A simple national petition: school shootings are unacceptable. Congress must act." />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root { color-scheme: light dark; }
-    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 24px; }
-    .hero { padding: 48px 0; display: grid; gap: 12px; }
-    .cta { display:flex; gap: 10px; flex-wrap: wrap; }
-    .btn { appearance: none; border: 0; background: #111; color: #fff; padding: 12px 18px; border-radius: 8px; cursor: pointer; text-decoration: none; display:inline-block; }
-    .btn-ghost { background: transparent; color: #111; border: 1px solid #ccc; }
-    input, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid #ccc; }
-    .grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
-    .grid-1 { grid-template-columns: 1fr; }
-    .muted { opacity: .65; }
-    .counter { font-weight: 700; }
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <section class="hero">
-      <h1>School shootings are unacceptable. Washington must act.</h1>
-      <p class="muted">Sign to call for a national, good‑faith process to address school shootings. No policy specifics here. Just a clear ask to start.</p>
-      <p class="muted">Signatures so far: <span id="counter" class="counter">—</span></p>
-      <div class="cta">
-        <a class="btn-ghost btn" href="/examples/original-index.html" rel="noopener">For example: see the original page</a>
-      </div>
-    </section>
-
-    <section>
-      <form id="petitionForm" method="POST"
-            action="/api/sign?redirect=https://donewaiting.us/thank-you.html"
-            class="grid grid-1" autocomplete="on">
-        <label>
-          ZIP Code
-          <input type="text" name="zip" inputmode="numeric" pattern="\d{5}" required placeholder="12345">
-        </label>
-        <label>
-          Name <span class="muted">(optional if you sign anonymously)</span>
-          <input type="text" name="name" placeholder="Jane Doe">
-        </label>
-        <label>
-          Email <span class="muted">(kept private; used only for validation)</span>
-          <input type="email" name="email" placeholder="you@example.com">
-        </label>
-        <label>
-          Role
-          <select name="role">
-            <option value="parent">Parent</option>
-            <option value="teacher">Teacher</option>
-            <option value="student">Student</option>
-            <option value="citizen">Citizen</option>
-          </select>
-        </label>
-        <label>
-          <input type="checkbox" id="anon" name="anonymous" value="1"> Sign anonymously
-        </label>
-        <button class="btn" type="submit">Sign the petition</button>
-      </form>
-    </section>
-
-    <section>
-      <h2>Why this matters</h2>
-      <p class="muted">No stump speeches. No culture‑war bait. Kids should be safe at school. That shouldn’t be controversial.</p>
-    </section>
-  </div>
-
-  <script>
-    async function fetchCount(retries = 2) {
-      const counter = document.getElementById('counter');
-      try {
-        const res = await fetch('/api/count', { cache: 'no-store' });
-        if (!res.ok) throw new Error('Bad status ' + res.status);
-        const data = await res.json();
-        const n = (data && typeof data.count === 'number') ? data.count : 0;
-        counter.textContent = new Intl.NumberFormat().format(n);
-      } catch (err) {
-        if (retries > 0) return fetchCount(retries - 1);
-        counter.textContent = '—';
-      }
-    }
-    fetchCount();
-
-    // Keep the hidden anonymous flag in sync for servers that prefer explicit 0/1
-    document.getElementById('anon').addEventListener('change', (e) => {
-      const form = document.getElementById('petitionForm');
-      let hidden = form.querySelector('input[name="anonymous"][type="hidden"]');
-      if (!hidden) {
-        hidden = document.createElement('input');
-        hidden.type = 'hidden';
-        hidden.name = 'anonymous';
-        form.appendChild(hidden);
-      }
-      hidden.value = e.target.checked ? '1' : '0';
-    });
-  </script>
-</body>
-</html>
-```
