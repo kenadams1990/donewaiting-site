@@ -1,0 +1,260 @@
+# Drop-in files (fast conversion + brain-dead share kit)
+
+Copy these two files into your site root. They’re standalone and don’t change your API.
+
+---
+
+## `/index.html` (v2 — optimized for 15–20s sign)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Done Waiting — Protect Our Schools</title>
+  <meta name="description" content="Add your name: school shootings are unacceptable. Washington must start a national process to address this.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light dark; }
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 24px; }
+    .hero { padding: 36px 0 16px; display: grid; gap: 10px; }
+    .timer { font-size: 14px; opacity:.7 }
+    .cta { display:flex; gap: 10px; flex-wrap: wrap; align-items:center }
+    .btn { appearance: none; border: 0; background: #111; color: #fff; padding: 14px 18px; border-radius: 10px; cursor: pointer; text-decoration: none; display:inline-block; font-weight:600 }
+    .btn-ghost { background: transparent; color: #111; border: 1px solid #ccc; }
+    form { margin-top: 8px }
+    label { display:block }
+    input, select { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid #ccc; font-size: 16px }
+    .grid { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    .grid-1 { grid-template-columns: 1fr; }
+    .muted { opacity: .75; }
+    .counter { font-weight: 700; }
+    .row { display:flex; gap:10px; align-items:center }
+    .small { font-size: 12px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero" aria-label="Call to action">
+      <h1>School shootings are unacceptable. Washington must act.</h1>
+      <p class="muted">Add your name. Broad tent. No politics here. Just a clear ask to start the national process.</p>
+      <p class="muted timer">Takes about 15–20 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
+      <div class="cta">
+        <a class="btn-ghost btn" href="/examples/original-index.html" rel="noopener">For example: see the original page</a>
+      </div>
+    </section>
+
+    <section aria-label="Sign the petition">
+      <form id="petitionForm" method="POST" action="/api/sign?redirect=/thank-you.html" class="grid grid-1" autocomplete="on">
+        <div class="grid">
+          <label>
+            ZIP Code
+            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\\d{5}" required placeholder="12345" aria-label="ZIP code">
+          </label>
+          <label>
+            Email <span class="muted small">(optional)</span>
+            <input name="email" type="email" placeholder="you@example.com" aria-label="Email (optional)">
+          </label>
+        </div>
+        <div class="grid">
+          <label>
+            Name <span class="muted small">(optional)</span>
+            <input name="name" type="text" placeholder="Jane Doe" aria-label="Name (optional)">
+          </label>
+          <label>
+            Role
+            <select name="role" aria-label="Role">
+              <option value="citizen">Citizen</option>
+              <option value="parent">Parent</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </label>
+        </div>
+        <div class="row small">
+          <label class="row" style="gap:6px">
+            <input type="checkbox" id="anon" name="anonymous" value="1" checked>
+            <span>Sign anonymously</span>
+          </label>
+          <span class="muted">We never show your email. Ever.</span>
+        </div>
+        <button class="btn" type="submit" aria-label="Sign the petition now">Sign in 1 step</button>
+      </form>
+    </section>
+
+    <section aria-label="Why this matters">
+      <h2>Why this matters</h2>
+      <p class="muted">No stump speeches. No culture‑war bait. Kids should be safe at school. That shouldn’t be controversial.</p>
+    </section>
+  </div>
+
+  <script>
+    // Focus ZIP immediately
+    window.addEventListener('DOMContentLoaded', () => document.getElementById('zip')?.focus());
+
+    // Counter via relative path so Netlify proxies in prod and dev runner works
+    async function fetchCount(retries = 2) {
+      const counter = document.getElementById('counter');
+      try {
+        const res = await fetch('/api/count', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Bad status ' + res.status);
+        const data = await res.json();
+        const n = (data && typeof data.count === 'number') ? data.count : 0;
+        counter.textContent = new Intl.NumberFormat().format(n);
+      } catch (err) {
+        if (retries > 0) return fetchCount(retries - 1);
+        counter.textContent = '—';
+      }
+    }
+    fetchCount();
+
+    // Keep hidden anonymous flag in sync for servers that prefer explicit 0/1
+    document.getElementById('anon').addEventListener('change', (e) => {
+      const form = document.getElementById('petitionForm');
+      let hidden = form.querySelector('input[name="anonymous"][type="hidden"]');
+      if (!hidden) {
+        hidden = document.createElement('input');
+        hidden.type = 'hidden'; hidden.name = 'anonymous';
+        form.appendChild(hidden);
+      }
+      hidden.value = e.target.checked ? '1' : '0';
+    });
+  </script>
+</body>
+</html>
+```
+
+---
+
+## `/thank-you.html` (dead‑simple share kit that even Mom can’t mess up)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank you — Done Waiting</title>
+  <meta name="description" content="Thanks for signing. Help by sharing this in two taps.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin:0; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 24px; }
+    h1 { margin-top: 28px }
+    .grid { display:grid; gap:12px; grid-template-columns: 1fr 1fr; }
+    @media (max-width:720px){ .grid { grid-template-columns: 1fr; } }
+    .btn { appearance:none; border:1px solid #ddd; background:#fff; border-radius:12px; padding:14px; display:flex; align-items:center; gap:12px; font-weight:600; cursor:pointer; text-decoration:none; color:#111 }
+    .btn:hover { background:#f6f6f6 }
+    .icon { width:22px; height:22px }
+    .copy { display:flex; gap:8px; align-items:center }
+    .muted { opacity:.75 }
+    .big { font-size: 15px }
+    .row { display:flex; gap:10px; flex-wrap:wrap }
+    .center { text-align:center }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Thank you.</h1>
+    <p class="muted">Last step: share this so others can sign. It takes 5 seconds.</p>
+
+    <div class="row" style="margin:14px 0">
+      <button id="share-native" class="btn big" style="background:#111;color:#fff">Share now (uses your phone’s share sheet)</button>
+    </div>
+
+    <div class="grid" aria-label="Share options">
+      <a id="share-fb" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12.06C22 6.48 17.52 2 11.94 2 6.36 2 1.88 6.48 1.88 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.9h2.42V9.68c0-2.39 1.43-3.72 3.62-3.72 1.05 0 2.15.19 2.15.19v2.36h-1.21c-1.2 0-1.58.75-1.58 1.52v1.83h2.7l-.43 2.9h-2.27V22c4.78-.76 8.44-4.92 8.44-9.94z"/></svg>
+        Share on Facebook
+      </a>
+      <a id="share-x" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.53 3H21l-7.59 8.68L22.5 21h-6.3l-4.93-6.04L5.3 21H2l8.08-9.23L1.8 3h6.44l4.46 5.64L17.53 3z"/></svg>
+        Share on X
+      </a>
+      <a id="share-wa" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2a10 10 0 00-8.6 15l-1 3.66 3.76-.99A10 10 0 1012.04 2z"/></svg>
+        WhatsApp
+      </a>
+      <a id="share-li" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 5 2.12 5 3.5zM.5 8.5h4V23h-4V8.5zM8.5 8.5h3.8v2h.05c.53-1 1.82-2.05 3.74-2.05 4 0 4.75 2.63 4.75 6.05V23h-4v-5.5c0-1.31-.02-3-1.83-3s-2.11 1.43-2.11 2.9V23h-4V8.5z"/></svg>
+        LinkedIn
+      </a>
+      <a id="share-reddit" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>
+        Reddit
+      </a>
+      <a id="share-email" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 6h20v12H2z"/></svg>
+        Email
+      </a>
+      <a id="share-sms" class="btn" target="_blank" rel="noopener">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v10H5.17L4 15.17z"/></svg>
+        Text message
+      </a>
+      <button id="copy-link" class="btn" type="button">
+        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.9 12a5 5 0 015-5h3v2h-3a3 3 0 100 6h3v2h-3a5 5 0 01-5-5zm6-1h4v2h-4v-2zm4.1-4h3a5 5 0 110 10h-3v-2h3a3 3 0 100-6h-3V7z"/></svg>
+        Copy link
+      </button>
+    </div>
+
+    <p class="muted center" style="margin-top:18px">Sharing not working? Just send them this link: <span id="share-url"></span></p>
+  </div>
+
+  <script>
+    const shareUrl = (new URL('/', window.location.href)).toString();
+    const title = 'Done Waiting — Protect Our Schools';
+    const text = 'Add your name: school shootings are unacceptable. Washington must act.';
+
+    document.getElementById('share-url').textContent = shareUrl;
+
+    // Native share sheet if available
+    document.getElementById('share-native').addEventListener('click', async () => {
+      if (navigator.share) {
+        try { await navigator.share({ title, text, url: shareUrl }); } catch {}
+      } else {
+        // fallback: focus buttons
+        document.getElementById('copy-link').focus();
+      }
+    });
+
+    // Helpers
+    function enc(s){ return encodeURIComponent(s); }
+
+    // Platform links
+    document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${enc(shareUrl)}&quote=${enc(text)}`;
+    document.getElementById('share-x').href  = `https://twitter.com/intent/tweet?text=${enc(text)}&url=${enc(shareUrl)}`;
+    document.getElementById('share-li').href = `https://www.linkedin.com/sharing/share-offsite/?url=${enc(shareUrl)}`;
+    document.getElementById('share-reddit').href = `https://www.reddit.com/submit?url=${enc(shareUrl)}&title=${enc(text)}`;
+    document.getElementById('share-wa').href = `https://wa.me/?text=${enc(text + ' ' + shareUrl)}`;
+
+    // Email
+    document.getElementById('share-email').href = `mailto:?subject=${enc('Please sign this')}&body=${enc(text + '\n\n' + shareUrl)}`;
+
+    // SMS (iOS vs Android)
+    const isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    const smsBody = enc(text + ' ' + shareUrl);
+    document.getElementById('share-sms').href = isiOS ? `sms:&body=${smsBody}` : `sms:?body=${smsBody}`;
+
+    // Copy link button
+    document.getElementById('copy-link').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        document.getElementById('copy-link').textContent = 'Copied!';
+        setTimeout(()=>{ document.getElementById('copy-link').textContent = 'Copy link'; }, 1500);
+      } catch {
+        const dummy = document.createElement('input');
+        dummy.value = shareUrl; document.body.appendChild(dummy); dummy.select();
+        try { document.execCommand('copy'); } catch {}
+        document.body.removeChild(dummy);
+      }
+    });
+  </script>
+</body>
+</html>
+```
