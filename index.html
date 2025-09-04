@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Done Waiting — Protect Our Schools</title>
+  <meta name="description" content="Add your name: school shootings are unacceptable. Washington must act." />
+  <!-- Social previews -->
+  <meta property="og:title" content="Done Waiting — Protect Our Schools" />
+  <meta property="og:description" content="Add your name: school shootings are unacceptable. Washington must act." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://www.donewaiting.us/" />
+  <meta property="og:image" content="https://www.donewaiting.us/assets/og.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Done Waiting — Protect Our Schools" />
+  <meta name="twitter:description" content="Add your name: school shootings are unacceptable. Washington must act." />
+  <meta name="twitter:image" content="https://www.donewaiting.us/assets/og.jpg" />
+  <style>
+    :root{--bg:#0b0b0b;--fg:#f5f5f5;--muted:#b3b3b3;--border:#2a2a2a;--primary:#2563eb;--primary-2:#3b82f6;--field:#111111}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+    .wrap{max-width:880px;margin:0 auto;padding:24px}
+    .hero{padding:36px 0 16px}
+    h1{font-size:clamp(28px,5.4vw,48px);line-height:1.12;margin:0 0 8px}
+    .bigline{font-weight:800;font-size:clamp(22px,4.6vw,38px);line-height:1.15;margin:4px 0}
+    .muted{color:var(--muted)}
+    .counter{font-weight:700}
+    .hero-img{margin:14px 0}
+    .hero-img img{width:100%;height:280px;object-fit:cover;border-radius:14px;border:1px solid var(--border)}
+    form{margin-top:8px}
+    label{display:block}
+    input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--field);color:#fff;font-size:16px}
+    .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+    .grid-1{grid-template-columns:1fr}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{appearance:none;border:0;border-radius:12px;padding:14px 18px;font-weight:700;cursor:pointer}
+    .btn-primary{background:linear-gradient(180deg,var(--primary-2),var(--primary));color:#fff;box-shadow:0 6px 20px #2563eb33}
+    .btn:focus{outline:2px solid #3b82f666;outline-offset:2px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero" aria-label="Call to action">
+      <h1>Do you disagree that we have a problem with school shootings in America?</h1>
+      <p class="bigline">Do you disagree that we need to do something about it?</p>
+      <p class="bigline">Add your name.</p>
+      <p class="muted">Takes ~15–20 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
+      <div class="hero-img">
+        <!-- If /assets/og.jpg isn’t there yet, this removes itself to avoid a broken image -->
+        <img src="/assets/og.jpg" alt="Students deserve safe schools" onerror="this.closest('.hero-img').remove()" />
+      </div>
+    </section>
+
+    <section aria-label="Sign the petition">
+      <form id="petitionForm" method="POST" action="/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
+        <div class="grid">
+          <label>ZIP Code
+            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}" required placeholder="12345" aria-label="ZIP code" />
+          </label>
+          <label>Email <span class="muted">(optional)</span>
+            <input name="email" type="email" placeholder="you@example.com" />
+          </label>
+        </div>
+        <div class="grid">
+          <label>Name <span class="muted">(optional)</span>
+            <input name="name" type="text" placeholder="Jane Doe" />
+          </label>
+          <label>Role
+            <select name="role">
+              <option value="citizen">Citizen</option>
+              <option value="parent">Parent</option>
+              <option value="teacher">Teacher</option>
+              <option value="student">Student</option>
+            </select>
+          </label>
+        </div>
+        <div class="row">
+          <label class="row" style="gap:6px"><input type="checkbox" id="anon" name="anonymous" value="1" checked> Sign anonymously</label>
+          <span class="muted">We never show your email.</span>
+        </div>
+        <button class="btn btn-primary" type="submit" aria-label="Sign the petition now">Sign in 1 step</button>
+      </form>
+    </section>
+  </div>
+
+  <script>
+    // autofocus zip for speed
+    window.addEventListener('DOMContentLoaded',()=>document.getElementById('zip')?.focus());
+    // counter
+    async function fetchCount(retries=2){
+      const c=document.getElementById('counter');
+      try{const res=await fetch('/api/count',{cache:'no-store'});if(!res.ok)throw 0;const data=await res.json();c.textContent=new Intl.NumberFormat().format(Number(data?.count||0));}
+      catch(e){if(retries>0)return fetchCount(retries-1);c.textContent='—';}
+    }
+    fetchCount();
+    // anonymous hidden flag
+    document.getElementById('anon').addEventListener('change',(e)=>{
+      const f=document.getElementById('petitionForm');
+      let h=f.querySelector('input[name="anonymous"][type="hidden"]');
+      if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);} h.value=e.target.checked?'1':'0';
+    });
+  </script>
+</body>
+</html>
