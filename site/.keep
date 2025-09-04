@@ -1,0 +1,8 @@
+/site
+  index.html
+  thank-you.html
+  404.html
+  _redirects
+  robots.txt
+  /assets (icons, og.jpg, site.webmanifest)
+  /examples/original-index.html
