@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /tools/
+Disallow: /examples/
+# Optional if you actually create one:
+# Sitemap: https://www.donewaiting.us/sitemap.xml
