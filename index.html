@@ -18,20 +18,19 @@
     :root{--bg:#0b0b0b;--fg:#f5f5f5;--muted:#b3b3b3;--border:#2a2a2a;--primary:#2563eb;--primary-2:#3b82f6;--field:#111111}
     *{box-sizing:border-box}
     html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
     .wrap{max-width:880px;margin:0 auto;padding:24px}
 
     /* Full-bleed hero wallpaper */
-.hero{position:relative;min-height:92vh;display:flex;align-items:flex-start}
-.hero::before{
-  content:"";
-  position:absolute;inset:0;
-  /* image first, gradient behind it as a fallback */
-  background:
-    url("/assets/hero.jpg") center/cover no-repeat,
-    linear-gradient(180deg,#0b0b0b 0%,#0b0b0b 100%);
-  filter:grayscale(20%) contrast(.95);
-}
+    .hero{position:relative;min-height:92vh;display:flex;align-items:flex-start}
+    .hero::before{
+      content:"";
+      position:absolute;inset:0;
+      background:
+        url("/assets/hero.jpg") center/cover no-repeat,
+        linear-gradient(180deg,#0b0b0b 0%,#0b0b0b 100%);
+      filter:grayscale(20%) contrast(.95);
+    }
     .hero-inner{position:relative;width:100%;padding-top:clamp(56px,10vh,120px);padding-bottom:clamp(28px,8vh,96px);}
 
     h1{font-size:clamp(26px,5vw,44px);line-height:1.1;margin:0 0 8px;text-wrap:balance;max-width:28ch}
@@ -48,25 +47,26 @@
     .btn{appearance:none;border:0;border-radius:12px;padding:14px 18px;font-weight:700;cursor:pointer}
     .btn-primary{background:linear-gradient(180deg,var(--primary-2),var(--primary));color:#fff;box-shadow:0 6px 20px #2563eb33}
     .btn:focus{outline:2px solid #3b82f666;outline-offset:2px}
-    /* tiny note + state counts */
-.disclaimer{font-size:13px;margin:6px 0 0;color:var(--muted)}
-.state-section{margin-top:18px}
-.state-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
-.state-toggle{font:inherit;font-size:13px;border:0;background:none;color:inherit;padding:6px 8px;border-radius:8px}
-.state-toggle:focus{outline:2px solid #3b82f666;outline-offset:2px}
-.state-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));font-size:13px}
-.state-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--field)}
+
+    /* disclaimer + state counts */
+    .disclaimer{font-size:13px;margin:6px 0 0;color:var(--muted)}
+    .state-section{margin-top:18px}
+    .state-head{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+    .state-toggle{font:inherit;font-size:13px;border:0;background:none;color:inherit;padding:6px 8px;border-radius:8px}
+    .state-toggle:focus{outline:2px solid #3b82f666;outline-offset:2px}
+    .state-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));font-size:13px}
+    .state-item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:10px;background:var(--field)}
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <section class="hero" aria-label="Call to action">
-      <div class="hero-inner">
-        <h1>Is it unreasonable to say school shootings are a national problem?</h1>
-        <h1>Do you think we should do something about it?</h1>
-        <p class="muted">Signatures so far: <span id="counter" class="counter">—</span></p>
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="wrap">
+        <section>
+          <p class="muted">Signatures so far: <span id="counter">—</span></p>
+          <h1>Is it unreasonable to say school shootings are a national problem?</h1>
+          <p class="bigline">Do you think we should<br>do something about it?</p>
 
-        <section aria-label="Sign the petition">
           <form id="petitionForm" method="POST" action="/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
             <input type="hidden" id="zipHidden" name="zip" value="99999">
             <div class="grid">
@@ -86,112 +86,122 @@
               </label>
             </div>
             <p class="disclaimer" role="note">
-             We don’t want your data. We want change. Name and email are optional. State is the only required field. We never sell or share your info.
+              We don’t want your data. We want change. Name and email are optional. State is the only required field. We never sell or share your info.
             </p>
             <button class="btn btn-primary" type="submit" aria-label="Sign the petition now">1 Click & Done</button>
           </form>
+
           <section class="state-section" aria-label="Supporters by state">
-  <div class="state-head">
-    <p class="muted" style="margin:0">Supporters by state</p>
-    <button id="toggleStates" class="state-toggle" type="button" aria-expanded="false">Show all</button>
-  </div>
-  <div id="stateCounts" class="state-grid" aria-live="polite"></div>
-</section>
+            <div class="state-head">
+              <p class="muted" style="margin:0">Supporters by state</p>
+              <button id="toggleStates" class="state-toggle" type="button" aria-expanded="false">Show all</button>
+            </div>
+            <div id="stateCounts" class="state-grid" aria-live="polite"></div>
+          </section>
         </section>
       </div>
-    </section>
+    </div>
   </div>
 
   <script>
-    // focus
+    // focus first field
     window.addEventListener('DOMContentLoaded',()=>document.getElementById('state')?.focus());
 
-    // Live count with cache-bust
+    // Live total count (cache-busted)
     async function fetchCount(retries=2){
       const el=document.getElementById('counter');
-      try{const res=await fetch('/api/count?t='+Date.now(),{cache:'no-store'});if(!res.ok)throw 0;const data=await res.json();el.textContent=new Intl.NumberFormat().format(Number(data?.count||0));}
-      catch(e){if(retries>0)return fetchCount(retries-1);el.textContent='—';}
+      try{
+        const res=await fetch('/api/count?t='+Date.now(),{cache:'no-store'});
+        if(!res.ok) throw 0;
+        const data=await res.json();
+        el.textContent=new Intl.NumberFormat().format(Number(data?.count||0));
+      }catch(e){ if(retries>0) return fetchCount(retries-1); el.textContent='—'; }
     }
     fetchCount();
-// --- supporters by state (top-3 by default, toggle to all) ---
-function normalizeStateMap(data){
-  if(!data) return {};
-  if (Array.isArray(data)) {
-    return data.reduce((m,r)=>{
-      const st=(r&&r.state||'').toUpperCase();
-      if(st) m[st]=Number(r.count||0);
-      return m;
-    },{});
-  }
-  // object map fallback
-  const m={}; for(const [k,v] of Object.entries(data)){m[k.toUpperCase()]=Number(v||0);} return m;
-}
 
-function renderStateCounts(map,{all=false}={}){
-  const grid=document.getElementById('stateCounts'); if(!grid) return;
-  const nf=new Intl.NumberFormat();
-  const entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);
-  const list=all?entries:entries.slice(0,3); // mobile-first: top 3
-  const frag=document.createDocumentFragment();
-  for(const [st,count] of list){
-    const item=document.createElement('div'); item.className='state-item';
-    const code=document.createElement('span'); code.textContent=st;
-    const val=document.createElement('span'); val.textContent=nf.format(count||0);
-    item.append(code,val); frag.appendChild(item);
-  }
-  grid.textContent=''; grid.appendChild(frag);
-}
+    // --- Supporters by state (top 3 by default) ---
+    const VALID_STATES=new Set(["AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"]);
 
-async function fetchCountsByState(){
-  const t=Date.now();
-  // 1) grouped endpoint
-  try{
-    const res=await fetch('/api/count?group=state&t='+t,{cache:'no-store'});
-    if(res.ok){
-      const data=await res.json();
-      const map=normalizeStateMap(data);
-      if(Object.keys(map).length){
-        setupToggle(map);
-        renderStateCounts(map,{all:false});
-        return;
+    function normalizeStateMap(data){
+      if(!data) return {};
+      if(Array.isArray(data)){
+        return data.reduce((m,r)=>{
+          const st=(r&&r.state||'').toUpperCase();
+          if(VALID_STATES.has(st)) m[st]=Number(r.count||0);
+          return m;
+        },{});
       }
+      const m={};
+      for(const [k,v] of Object.entries(data)){
+        const st=(k||'').toUpperCase();
+        if(VALID_STATES.has(st)) m[st]=Number(v||0);
+      }
+      return m;
     }
-  }catch{}
-  // 2) per-state fallback using byStateZip keys (declared below)
-  const states=Object.keys(byStateZip||{});
-  const results=await Promise.all(states.map(async st=>{
-    try{
-      const r=await fetch('/api/count?state='+st+'&t='+t,{cache:'no-store'});
-      if(!r.ok) throw 0; const d=await r.json();
-      return [st, Number(d?.count||0)];
-    }catch{return [st,0]}
-  }));
-  const map=Object.fromEntries(results);
-setupToggle(map);
-renderStateCounts(map,{all:false});
-} // end fetchCountsByState
 
-function setupToggle(map){
-  const btn=document.getElementById('toggleStates'); if(!btn) return;
-  btn.addEventListener('click',()=>{
-    const expanded=btn.getAttribute('aria-expanded')==='true';
-    btn.setAttribute('aria-expanded', String(!expanded));
-    btn.textContent=expanded?'Show all':'Show top 3';
-    renderStateCounts(map,{all:!expanded});
-  });
-}
+    function renderStateCounts(map,{all=false}={}){
+      const grid=document.getElementById('stateCounts'); if(!grid) return;
+      const nf=new Intl.NumberFormat();
+      const entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);
+      const list=all?entries:entries.slice(0,3);
+      const frag=document.createDocumentFragment();
+      for(const [st,count] of list){
+        const item=document.createElement('div'); item.className='state-item';
+        const code=document.createElement('span'); code.textContent=st;
+        const val=document.createElement('span'); val.textContent=nf.format(count||0);
+        item.append(code,val); frag.appendChild(item);
+      }
+      grid.textContent=''; grid.appendChild(frag);
+    }
 
-// Set anonymous automatically: if no name, anonymous=1 else 0
-document.getElementById('petitionForm').addEventListener('submit',()=>{
-  const f=document.getElementById('petitionForm');
-  let h=f.querySelector('input[name="anonymous"][type="hidden"]');
-  if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);}
-  h.value=(document.getElementById('name').value.trim().length? '0':'1');
-});
+    async function fetchCountsByState(){
+      const t=Date.now();
+      // 1) Try grouped endpoint
+      try{
+        const res=await fetch('/api/count?group=state&t='+t,{cache:'no-store'});
+        if(res.ok){
+          const data=await res.json();
+          const map=normalizeStateMap(data);
+          if(Object.keys(map).length){
+            setupToggle(map);
+            renderStateCounts(map,{all:false});
+            return;
+          }
+        }
+      }catch{}
+
+      // 2) Fallback: per-state
+      const states=[...VALID_STATES];
+      const results=await Promise.all(states.map(async st=>{
+        try{
+          const r=await fetch('/api/count?state='+st+'&t='+t,{cache:'no-store'});
+          if(!r.ok) throw 0;
+          const d=await r.json();
+          return [st,Number(d?.count||0)];
+        }catch{ return [st,0] }
+      }));
+      const map=Object.fromEntries(results);
+      setupToggle(map);
+      renderStateCounts(map,{all:false});
+    }
+
+    function setupToggle(map){
+      const btn=document.getElementById('toggleStates'); if(!btn) return;
+      btn.textContent='Show all';
+      btn.setAttribute('aria-expanded','false');
+      btn.addEventListener('click',()=>{
+        const expanded=btn.getAttribute('aria-expanded')==='true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        btn.textContent=expanded?'Show all':'Show top 3';
+        renderStateCounts(map,{all:!expanded});
+      });
+    }
+
     // Hidden zip per state for backend compatibility
-    const byStateZip={AL:'35005',AK:'99501',AZ:'85001',AR:'72201',CA:'90001',CO:'80014',CT:'06103',DE:'19701',DC:'20001',FL:'33101',GA:'30301',HI:'96801',ID:'83701',IL:'60601',IN:'46201',IA:'50301',KS:'66101',KY:'40201',LA:'70112',ME:'04101',MD:'21201',MA:'02108',MI:'48201',MN:'55401',MS:'39201',MO:'63101',MT:'59001',NE:'68102',NV:'89101',NH:'03301',NJ:'07101',NM:'87501',NY:'10001',NC:'27601',ND:'58102',OH:'43215',OK:'73102',OR:'97201',PA:'15219',RI:'02903',SC:'29201',SD:'57104',TN:'37201',TX:'73301',UT:'84101',VT:'05602',VA:'23219',WA:'98101',WV:'25301',WI:'53202',WY:'82001'};
-    fetchCountsByState();
-    document.getElementById('state').addEventListener('change',(e)=>{document.getElementById('zipHidden').value=byStateZip[e.target.value]||'99999';});
+    const byStateZip={AL:"35005",AK:"99501",AZ:"85001",AR:"72201",CA:"90001",CO:"80014",CT:"06103",DE:"19701",DC:"20001",FL:"33101",GA:"30301",HI:"96801",ID:"83701",IL:"60601",IN:"46201",IA:"50301",KS:"66101",KY:"40201",LA:"70112",ME:"04101",MD:"21201",MA:"02108",MI:"48201",MN:"55401",MS:"39201",MO:"63101",MT:"59001",NE:"68102",NV:"89101",NH:"03301",NJ:"07101",NM:"87501",NY:"10001",NC:"27601",ND:"58102",OH:"43215",OK:"73102",OR:"97201",PA:"15219",RI:"02903",SC:"29201",SD:"57104",TN:"37201",TX:"73301",UT:"84101",VT:"05602",VA:"23219",WA:"98101",WV:"25301",WI:"53202",WY:"82001"};
+    document.getElementById('state').addEventListener('change',(e)=>{
+      document.getElementById('zipHidden').value=byStateZip[e.target.value]||'99999';
+    });
 
     // Set anonymous automatically: if no name, anonymous=1 else 0
     document.getElementById('petitionForm').addEventListener('submit',()=>{
@@ -200,6 +210,9 @@ document.getElementById('petitionForm').addEventListener('submit',()=>{
       if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);}
       h.value=(document.getElementById('name').value.trim().length? '0':'1');
     });
+
+    // Kick off the state counts after byStateZip exists
+    fetchCountsByState();
   </script>
 </body>
 </html>
