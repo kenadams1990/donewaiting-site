@@ -16,8 +16,17 @@
     a.btn{display:inline-block;text-decoration:none;color:#fff;background:linear-gradient(180deg,var(--primary-2),var(--primary));padding:12px 14px;border-radius:12px;font-weight:700}
     .muted{color:var(--muted)}
     .disclaimer{font-size:13px;margin:6px 0 0;color:var(--muted)}
-    .share-grid{display:grid;gap:8px;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
-    .card{border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--field)}
+    .share-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:14px 0}
+    .card,.card:link,.card:visited{color:#fff;text-decoration:none} /* kill blue/purple UA colors */
+    .card{
+      display:flex;align-items:center;justify-content:center;gap:10px;
+      min-height:46px;padding:12px 14px;border-radius:14px;border:1px solid var(--border);
+      background:linear-gradient(180deg,var(--primary-2),var(--primary));
+      box-shadow:0 6px 18px #2563eb33
+}
+.card.btn-ghost{background:var(--field)}
+.card .icon{font-size:18px;line-height:0;filter:saturation(0) brightness(2)} /* monochrome emoji-ish */
+.card:focus{outline:2px solid var(--primary);outline-offset:3px}
   </style>
 </head>
 <body>
@@ -26,17 +35,31 @@
     <p>Two more taps helps a lot:</p>
 
     <div class="share-grid">
-      <a id="share-x" class="card" target="_blank" rel="noopener">Post on X</a>
-      <a id="share-fb" class="card" target="_blank" rel="noopener">Post on Facebook</a>
-      <a id="share-reddit" class="card" target="_blank" rel="noopener">Post on Reddit</a>
-      <a id="share-wa" class="card" target="_blank" rel="noopener">Share on WhatsApp</a>
-      <a id="share-email" class="card" target="_blank" rel="noopener">Email</a>
-      <a id="share-sms" class="card">Text message</a>
-      <button id="copy-link" class="card" type="button">Copy link</button>
-    </div>
+  <a id="share-x" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">𝕏</span><span>Post on X</span>
+  </a>
+  <a id="share-fb" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">f</span><span>Post on Facebook</span>
+  </a>
+  <a id="share-reddit" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">👽</span><span>Post on Reddit</span>
+  </a>
+  <a id="share-wa" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">💬</span><span>Share on WhatsApp</span>
+  </a>
+  <a id="share-email" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">✉️</span><span>Email</span>
+  </a>
+  <a id="share-sms" class="card" target="_blank" rel="noopener">
+    <span class="icon" aria-hidden="true">📱</span><span>Text message</span>
+  </a>
+  <button id="copy-link" class="card btn-ghost" type="button">
+    <span class="icon" aria-hidden="true">🔗</span><span>Copy link</span>
+  </button>
+</div>
 
     <p class="disclaimer" role="note">
-      We don’t want your data. We want change. Name and email are optional. State is the only required field. We never sell or share your info.
+      We don’t want your data. We want change. We never sell or share your info.
     </p>
 
     <p class="muted" style="margin-top:18px">If sharing doesn’t open, copy this link: <span id="share-url"></span></p>
