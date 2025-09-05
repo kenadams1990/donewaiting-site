@@ -1,3 +1,6 @@
+## /index.html (swap-in)
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,7 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Done Waiting — Protect Our Schools</title>
   <meta name="description" content="Add your name: school shootings are unacceptable. Washington must act." />
-  <!-- Social previews -->
   <meta property="og:title" content="Done Waiting — Protect Our Schools" />
   <meta property="og:description" content="Add your name: school shootings are unacceptable. Washington must act." />
   <meta property="og:type" content="website" />
@@ -21,13 +23,15 @@
     html,body{height:100%}
     body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--fg)}
     .wrap{max-width:880px;margin:0 auto;padding:24px}
-    .hero{padding:36px 0 16px}
-    h1{font-size:clamp(28px,5.4vw,48px);line-height:1.12;margin:0 0 8px}
-    .bigline{font-weight:800;font-size:clamp(22px,4.6vw,38px);line-height:1.15;margin:4px 0}
+    .hero{padding:28px 0 10px}
+    h1{font-size:clamp(26px,5vw,44px);line-height:1.1;margin:0 0 8px;text-wrap:balance;max-width:28ch}
+    .bigline{font-weight:750;font-size:clamp(20px,4.2vw,34px);line-height:1.15;margin:4px 0;max-width:28ch}
     .muted{color:var(--muted)}
     .counter{font-weight:700}
-    .hero-img{margin:14px 0}
-    .hero-img img{width:100%;height:280px;object-fit:cover;border-radius:14px;border:1px solid var(--border)}
+    /* Somber hero banner with dark overlay; supply /assets/hero.jpg */
+    .hero-banner{position:relative;border-radius:16px;border:1px solid var(--border);overflow:hidden;height:300px;margin:12px 0}
+    .hero-banner::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#00000066,#000000aa),url('/assets/hero.jpg?v=1') center/cover no-repeat;filter:grayscale(25%) contrast(.95)}
+    .sr{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
     form{margin-top:8px}
     label{display:block}
     input,select{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:var(--field);color:#fff;font-size:16px}
@@ -42,21 +46,18 @@
 <body>
   <div class="wrap">
     <section class="hero" aria-label="Call to action">
-      <h1>Do you disagree that we have a problem with school shootings in America?</h1>
-      <p class="bigline">Do you disagree that we need to do something about it?</p>
+      <h1>Do you think there's a problem with school shootings in America?</h1>
+      <p class="bigline">Do you thik we should do something about it?</p>
       <p class="bigline">Add your name.</p>
-      <p class="muted">Takes ~15–20 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
-      <div class="hero-img">
-        <!-- If /assets/og.jpg isn’t there yet, this removes itself to avoid a broken image -->
-        <img src="/assets/og.jpg" alt="Students deserve safe schools" onerror="this.closest('.hero-img').remove()" />
-      </div>
+      <p class="muted">Takes ~10 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
+      <div class="hero-banner" role="img" aria-label="Somber image reminding us what’s at stake"><span class="sr">Representative, non‑graphic photo</span></div>
     </section>
 
     <section aria-label="Sign the petition">
       <form id="petitionForm" method="POST" action="/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
         <div class="grid">
           <label>ZIP Code
-            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}" required placeholder="12345" aria-label="ZIP code" />
+            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\\d{5}" required placeholder="12345" aria-label="ZIP code" />
           </label>
           <label>Email <span class="muted">(optional)</span>
             <input name="email" type="email" placeholder="you@example.com" />
@@ -65,14 +66,6 @@
         <div class="grid">
           <label>Name <span class="muted">(optional)</span>
             <input name="name" type="text" placeholder="Jane Doe" />
-          </label>
-          <label>Role
-            <select name="role">
-              <option value="citizen">Citizen</option>
-              <option value="parent">Parent</option>
-              <option value="teacher">Teacher</option>
-              <option value="student">Student</option>
-            </select>
           </label>
         </div>
         <div class="row">
@@ -85,21 +78,11 @@
   </div>
 
   <script>
-    // autofocus zip for speed
     window.addEventListener('DOMContentLoaded',()=>document.getElementById('zip')?.focus());
-    // counter
-    async function fetchCount(retries=2){
-      const c=document.getElementById('counter');
-      try{const res=await fetch('/api/count',{cache:'no-store'});if(!res.ok)throw 0;const data=await res.json();c.textContent=new Intl.NumberFormat().format(Number(data?.count||0));}
-      catch(e){if(retries>0)return fetchCount(retries-1);c.textContent='—';}
-    }
+    async function fetchCount(retries=2){const c=document.getElementById('counter');try{const res=await fetch('/api/count',{cache:'no-store'});if(!res.ok)throw 0;const data=await res.json();c.textContent=new Intl.NumberFormat().format(Number(data?.count||0));}catch(e){if(retries>0)return fetchCount(retries-1);c.textContent='—';}}
     fetchCount();
-    // anonymous hidden flag
-    document.getElementById('anon').addEventListener('change',(e)=>{
-      const f=document.getElementById('petitionForm');
-      let h=f.querySelector('input[name="anonymous"][type="hidden"]');
-      if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);} h.value=e.target.checked?'1':'0';
-    });
+    document.getElementById('anon').addEventListener('change',(e)=>{const f=document.getElementById('petitionForm');let h=f.querySelector('input[name="anonymous"][type="hidden"]');if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);} h.value=e.target.checked?'1':'0';});
   </script>
 </body>
 </html>
+```
