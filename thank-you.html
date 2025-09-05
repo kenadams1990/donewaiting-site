@@ -16,45 +16,87 @@
     a.btn{display:inline-block;text-decoration:none;color:#fff;background:linear-gradient(180deg,var(--primary-2),var(--primary));padding:12px 14px;border-radius:12px;font-weight:700}
     .muted{color:var(--muted)}
     .disclaimer{font-size:13px;margin:6px 0 0;color:var(--muted)}
-    .share-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin:14px 0}
-    .card,.card:link,.card:visited{color:#fff;text-decoration:none} /* kill blue/purple UA colors */
-    .card{
-      display:flex;align-items:center;justify-content:center;gap:10px;
-      min-height:46px;padding:12px 14px;border-radius:14px;border:1px solid var(--border);
-      background:linear-gradient(180deg,var(--primary-2),var(--primary));
-      box-shadow:0 6px 18px #2563eb33
+    .share-grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));margin:14px 0}
+.card,.card:link,.card:visited{color:#fff;text-decoration:none}
+.card{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:52px;padding:12px 14px;border-radius:14px;border:1px solid var(--border);
+  box-shadow:0 8px 24px #00000033
 }
-.card.btn-ghost{background:var(--field)}
-.card .icon{font-size:18px;line-height:0;filter:saturation(0) brightness(2)} /* monochrome emoji-ish */
-.card:focus{outline:2px solid var(--primary);outline-offset:3px}
+.card svg{width:20px;height:20px;display:block}
+.card.btn-ghost{background:#181818}
+
+/* platform colors + hover tints */
+.card.native{background:#2b2b2b}
+.card.native:hover{filter:brightness(1.06);box-shadow:0 10px 26px #2b2b2b66}
+
+.card.x{background:#111}
+.card.x:hover{filter:brightness(1.08);box-shadow:0 12px 28px #0008}
+
+.card.fb{background:#1877F2}
+.card.fb:hover{filter:brightness(1.06);box-shadow:0 12px 28px #1877f280}
+
+.card.reddit{background:#FF4500}
+.card.reddit:hover{filter:brightness(1.08);box-shadow:0 12px 28px #ff450080}
+
+.card.wa{background:#25D366}
+.card.wa:hover{filter:brightness(1.05);box-shadow:0 12px 28px #25d36680}
+
+.card.email{background:#6C6CF0}
+.card.email:hover{filter:brightness(1.06);box-shadow:0 12px 28px #6c6cf080}
+
+.card.sms{background:#34C759}
+.card.sms:hover{filter:brightness(1.05);box-shadow:0 12px 28px #34c75980}
+
+.card.copy{background:#202020}
+.card.copy:hover{filter:brightness(1.06);box-shadow:0 12px 28px #20202080}
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Thank you.</h1>
-    <p>Two more taps helps a lot:</p>
+    <p>Amplify your voice, 5 more seconds to share</p>
 
     <div class="share-grid">
-  <a id="share-x" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">𝕏</span><span>Post on X</span>
+  <!-- Native share (shown on mobile if supported) -->
+  <button id="native-share" class="card native" type="button" style="display:none">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M13 3l4 4-4 4V8h-2a7 7 0 00-7 7v3h-2v-3a9 9 0 019-9h2V3z"/><path fill="#fff" d="M20 11h-2v8H6v-2H4v4h16z"/></svg>
+    <span>Share</span>
+  </button>
+
+  <a id="share-x" class="card x" target="_blank" rel="noopener" aria-label="Share on X">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M3 3h4.2l5.1 6.9L17.6 3H21l-7.1 9.7L21 21h-4.2l-5.5-7.4L6.4 21H3l7.5-10L3 3z"/></svg>
+    <span>X</span>
   </a>
-  <a id="share-fb" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">f</span><span>Post on Facebook</span>
+
+  <a id="share-fb" class="card fb" target="_blank" rel="noopener" aria-label="Share on Facebook">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M13 22v-8h3l.5-4H13V7.5c0-1.1.3-1.8 1.9-1.8H17V2.2c-.9-.1-2-.2-3.1-.2-3.1 0-5.2 1.9-5.2 5.3V10H6v4h2.7v8H13z"/></svg>
+    <span>Facebook</span>
   </a>
-  <a id="share-reddit" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">👽</span><span>Post on Reddit</span>
+
+  <a id="share-reddit" class="card reddit" target="_blank" rel="noopener" aria-label="Share on Reddit">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M21 12.5c0-1-.8-1.8-1.8-1.8-.6 0-1.1.3-1.4.8-1.2-.8-2.8-1.3-4.6-1.4l.7-3.2 2.2.5c0 .8.7 1.5 1.5 1.5.9 0 1.6-.7 1.6-1.6S18.5 5 17.6 5c-.6 0-1.1.4-1.4.9l-2.7-.6c-.2 0-.4.1-.4.3l-.8 3.7c-1.9 0-3.5.6-4.7 1.4-.3-.5-.8-.8-1.4-.8-1 0-1.8.8-1.8 1.8 0 .7.4 1.2 1 1.6-.1.3-.1.5-.1.7 0 2.5 3 4.6 6.7 4.6s6.7-2 6.7-4.6c0-.2 0-.5-.1-.7.6-.3 1-.9 1-1.6zM8.9 14.5c0-.7.6-1.2 1.3-1.2s1.3.6 1.3 1.2c0 .7-.6 1.2-1.3 1.2s-1.3-.5-1.3-1.2zm7.9 2.1c-.8.8-2.3 1.3-3.9 1.3s-3.1-.5-3.9-1.3c-.2-.2-.2-.5 0-.7.2-.2.5-.2.7 0 .6.6 1.8 1 3.2 1s2.5-.4 3.2-1c.2-.2.5-.2.7 0s.2.5 0 .7zM12.8 15.7c-.7 0-1.3-.6-1.3-1.2 0-.7.6-1.2 1.3-1.2s1.3.6 1.3 1.2c0 .7-.6 1.2-1.3 1.2z"/></svg>
+    <span>Reddit</span>
   </a>
-  <a id="share-wa" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">💬</span><span>Share on WhatsApp</span>
+
+  <a id="share-wa" class="card wa" target="_blank" rel="noopener" aria-label="Share on WhatsApp">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M20 12.1C20 7.6 16.4 4 11.9 4S3.8 7.6 3.8 12.1c0 1.5.4 2.8 1.1 4.1L4 21l4-1c1.2.7 2.5 1.1 3.9 1.1 4.5 0 8.1-3.6 8.1-8.1zM11.9 6c3.4 0 6.1 2.8 6.1 6.1 0 3.4-2.8 6.1-6.1 6.1-1.2 0-2.3-.3-3.2-.9l-.2-.1-2.4.6.6-2.3-.1-.2c-.6-1-.9-2.1-.9-3.2C5.6 8.8 8.4 6 11.9 6zm3.4 8.3c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1-.1.2-.6.7-.7.8-.1.1-.2.1-.4 0-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.3-1.3-1.6-.1-.2 0-.3.1-.4.1-.1.2-.2.3-.3.1-.1.1-.2.2-.3.1-.1.1-.2 0-.4-.1-.2-.5-1.2-.7-1.6s-.4-.4-.5-.4h-.4c-.1 0-.4.1-.7.3-.2.2-.7.6-.7 1.5s.7 1.8.8 1.9c.1.2 1.5 2.3 3.6 3.2.5.2.9.3 1.2.4.5.2 1 .2 1.3.1.4-.1 1.3-.5 1.4-1 .2-.5.2-.9.1-1 0-.1-.2-.1-.3-.2z"/></svg>
+    <span>WhatsApp</span>
   </a>
-  <a id="share-email" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">✉️</span><span>Email</span>
+
+  <a id="share-email" class="card email" target="_blank" rel="noopener" aria-label="Share by Email">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M2 6h20v12H2z"/><path fill="#111" d="M3 7h18v10H3z"/><path fill="#fff" d="M3 7l9 6 9-6v-1H3z"/></svg>
+    <span>Email</span>
   </a>
-  <a id="share-sms" class="card" target="_blank" rel="noopener">
-    <span class="icon" aria-hidden="true">📱</span><span>Text message</span>
+
+  <a id="share-sms" class="card sms" target="_blank" rel="noopener" aria-label="Share by Text message">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M4 5h16a2 2 0 012 2v7a2 2 0 01-2 2H8l-4 3v-3H4a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>
+    <span>Text</span>
   </a>
-  <button id="copy-link" class="card btn-ghost" type="button">
-    <span class="icon" aria-hidden="true">🔗</span><span>Copy link</span>
+
+  <button id="copy-link" class="card copy btn-ghost" type="button" aria-label="Copy link">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#fff" d="M10 7h8a3 3 0 013 3v8a3 3 0 01-3 3h-8a3 3 0 01-3-3v-8a3 3 0 013-3zm-4 8H5a3 3 0 01-3-3V6a3 3 0 013-3h8a3 3 0 013 3v1h-2V6a1 1 0 00-1-1H5a1 1 0 00-1 1v6a1 1 0 001 1h1v2z"/></svg>
+    <span>Copy link</span>
   </button>
 </div>
 
@@ -66,6 +108,40 @@
   </div>
 
   <script>
+    const shareUrl='https://www.donewaiting.us/';
+const text='Add your name: school shootings are unacceptable. Washington must act.';
+const enc=encodeURIComponent;
+
+// Show native share if supported
+const nativeBtn=document.getElementById('native-share');
+if(navigator.share && nativeBtn){
+  nativeBtn.style.display='';
+  nativeBtn.addEventListener('click',async()=>{
+    try{ await navigator.share({title:'Done Waiting', text, url:shareUrl}); }
+    catch(_){} // user canceled
+  });
+}
+// Link-based fallbacks
+document.getElementById('share-x').href=`https://x.com/intent/tweet?text=${enc(text)}&url=${enc(shareUrl)}`;
+document.getElementById('share-fb').href=`https://www.facebook.com/sharer/sharer.php?u=${enc(shareUrl)}`;
+document.getElementById('share-reddit').href=`https://www.reddit.com/submit?url=${enc(shareUrl)}&title=${enc(text)}`;
+document.getElementById('share-wa').href=`https://wa.me/?text=${enc(text+' '+shareUrl)}`;
+document.getElementById('share-email').href=`mailto:?subject=${enc('Please sign this')}&body=${enc(text+'\n\n'+shareUrl)}`;
+const isiOS=/iPad|iPhone|iPod/.test(navigator.userAgent);
+const smsBody=enc(text+' '+shareUrl);
+document.getElementById('share-sms').href=isiOS?`sms:&body=${smsBody}`:`sms:?body=${smsBody}`;
+
+document.getElementById('share-url')?.replaceWith(document.createTextNode(shareUrl));
+document.getElementById('copy-link').addEventListener('click',async()=>{
+  try{
+    await navigator.clipboard.writeText(shareUrl);
+    const btn=document.getElementById('copy-link'); const prev=btn.lastChild.textContent;
+    btn.lastChild.textContent='Copied!'; setTimeout(()=>btn.lastChild.textContent=prev,1200);
+  }catch{
+    const d=document.createElement('input');d.value=shareUrl;document.body.appendChild(d);d.select();
+    try{document.execCommand('copy');}catch{}document.body.removeChild(d);
+  }
+});
     const shareUrl='https://www.donewaiting.us/';
     const text='Add your name: school shootings are unacceptable. Washington must act.';
     const enc=encodeURIComponent;
