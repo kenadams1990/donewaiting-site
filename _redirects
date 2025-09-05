@@ -1,3 +1,3 @@
 http://*donewaiting.us/*     https://www.donewaiting.us/:splat   301!
 https://donewaiting.us/*     https://www.donewaiting.us/:splat   301!
-/api/*                       https://api.donewaiting.us/:splat   200
+/api/*                       https://api.donewaiting.us/api/:splat   200
