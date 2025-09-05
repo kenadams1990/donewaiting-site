@@ -1,0 +1,11 @@
+/               # HTML entry
+  Cache-Control: no-store, max-age=0, must-revalidate
+
+/*.html         # all HTML pages
+  Cache-Control: no-store, max-age=0, must-revalidate
+
+/assets/*       # images, fonts, etc.
+  Cache-Control: public, max-age=31536000, immutable
+
+/api/*          # proxied API calls
+  Cache-Control: no-store, max-age=0
