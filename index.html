@@ -1,4 +1,4 @@
-## /index.html (swap-in)
+## /index.html (replace file with this)
 
 ```html
 <!DOCTYPE html>
@@ -28,7 +28,6 @@
     .bigline{font-weight:750;font-size:clamp(20px,4.2vw,34px);line-height:1.15;margin:4px 0;max-width:28ch}
     .muted{color:var(--muted)}
     .counter{font-weight:700}
-    /* Somber hero banner with dark overlay; supply /assets/hero.jpg */
     .hero-banner{position:relative;border-radius:16px;border:1px solid var(--border);overflow:hidden;height:300px;margin:12px 0}
     .hero-banner::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#00000066,#000000aa),url('/assets/hero.jpg?v=1') center/cover no-repeat;filter:grayscale(25%) contrast(.95)}
     .sr{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
@@ -47,30 +46,85 @@
   <div class="wrap">
     <section class="hero" aria-label="Call to action">
       <h1>Do you think there's a problem with school shootings in America?</h1>
-      <p class="bigline">Do you thik we should do something about it?</p>
+      <p class="bigline">Do you think we should do something about it?</p>
       <p class="bigline">Add your name.</p>
       <p class="muted">Takes ~10 seconds. Signatures so far: <span id="counter" class="counter">—</span></p>
       <div class="hero-banner" role="img" aria-label="Somber image reminding us what’s at stake"><span class="sr">Representative, non‑graphic photo</span></div>
     </section>
 
     <section aria-label="Sign the petition">
+      <!-- state-only required, but we still include a hidden zip for backend compatibility -->
       <form id="petitionForm" method="POST" action="/api/sign?redirect=https://www.donewaiting.us/thank-you.html" class="grid grid-1" autocomplete="on">
+        <input type="hidden" id="zipHidden" name="zip" value="99999"><!-- why: current API expects zip; use placeholder -->
         <div class="grid">
-          <label>ZIP Code
-            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\\d{5}" required placeholder="12345" aria-label="ZIP code" />
+          <label>Name <span class="muted">(optional)</span>
+            <input name="name" type="text" placeholder="Jane Doe" />
           </label>
           <label>Email <span class="muted">(optional)</span>
             <input name="email" type="email" placeholder="you@example.com" />
           </label>
         </div>
         <div class="grid">
-          <label>Name <span class="muted">(optional)</span>
-            <input name="name" type="text" placeholder="Jane Doe" />
+          <label>State <span class="muted">(required)</span>
+            <select name="state" id="state" required>
+              <option value="" selected disabled>Choose a state</option>
+              <option value="AL">Alabama</option>
+              <option value="AK">Alaska</option>
+              <option value="AZ">Arizona</option>
+              <option value="AR">Arkansas</option>
+              <option value="CA">California</option>
+              <option value="CO">Colorado</option>
+              <option value="CT">Connecticut</option>
+              <option value="DE">Delaware</option>
+              <option value="DC">District of Columbia</option>
+              <option value="FL">Florida</option>
+              <option value="GA">Georgia</option>
+              <option value="HI">Hawaii</option>
+              <option value="ID">Idaho</option>
+              <option value="IL">Illinois</option>
+              <option value="IN">Indiana</option>
+              <option value="IA">Iowa</option>
+              <option value="KS">Kansas</option>
+              <option value="KY">Kentucky</option>
+              <option value="LA">Louisiana</option>
+              <option value="ME">Maine</option>
+              <option value="MD">Maryland</option>
+              <option value="MA">Massachusetts</option>
+              <option value="MI">Michigan</option>
+              <option value="MN">Minnesota</option>
+              <option value="MS">Mississippi</option>
+              <option value="MO">Missouri</option>
+              <option value="MT">Montana</option>
+              <option value="NE">Nebraska</option>
+              <option value="NV">Nevada</option>
+              <option value="NH">New Hampshire</option>
+              <option value="NJ">New Jersey</option>
+              <option value="NM">New Mexico</option>
+              <option value="NY">New York</option>
+              <option value="NC">North Carolina</option>
+              <option value="ND">North Dakota</option>
+              <option value="OH">Ohio</option>
+              <option value="OK">Oklahoma</option>
+              <option value="OR">Oregon</option>
+              <option value="PA">Pennsylvania</option>
+              <option value="RI">Rhode Island</option>
+              <option value="SC">South Carolina</option>
+              <option value="SD">South Dakota</option>
+              <option value="TN">Tennessee</option>
+              <option value="TX">Texas</option>
+              <option value="UT">Utah</option>
+              <option value="VT">Vermont</option>
+              <option value="VA">Virginia</option>
+              <option value="WA">Washington</option>
+              <option value="WV">West Virginia</option>
+              <option value="WI">Wisconsin</option>
+              <option value="WY">Wyoming</option>
+            </select>
           </label>
-        </div>
-        <div class="row">
-          <label class="row" style="gap:6px"><input type="checkbox" id="anon" name="anonymous" value="1" checked> Sign anonymously</label>
-          <span class="muted">We never show your email.</span>
+          <label class="row" style="gap:6px;align-items:center">
+            <input type="checkbox" id="anon" name="anonymous" value="1" checked>
+            <span>Sign anonymously</span>
+          </label>
         </div>
         <button class="btn btn-primary" type="submit" aria-label="Sign the petition now">Sign in 1 step</button>
       </form>
@@ -78,10 +132,32 @@
   </div>
 
   <script>
-    window.addEventListener('DOMContentLoaded',()=>document.getElementById('zip')?.focus());
-    async function fetchCount(retries=2){const c=document.getElementById('counter');try{const res=await fetch('/api/count',{cache:'no-store'});if(!res.ok)throw 0;const data=await res.json();c.textContent=new Intl.NumberFormat().format(Number(data?.count||0));}catch(e){if(retries>0)return fetchCount(retries-1);c.textContent='—';}}
+    window.addEventListener('DOMContentLoaded',()=>document.getElementById('state')?.focus());
+
+    // Cache-bust count to avoid stale edge responses
+    async function fetchCount(retries=2){
+      const el=document.getElementById('counter');
+      try{
+        const res=await fetch('/api/count?t='+Date.now(),{cache:'no-store'});
+        if(!res.ok) throw 0; const data=await res.json();
+        el.textContent=new Intl.NumberFormat().format(Number(data?.count||0));
+      }catch(e){ if(retries>0) return fetchCount(retries-1); el.textContent='—'; }
+    }
     fetchCount();
-    document.getElementById('anon').addEventListener('change',(e)=>{const f=document.getElementById('petitionForm');let h=f.querySelector('input[name="anonymous"][type="hidden"]');if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);} h.value=e.target.checked?'1':'0';});
+
+    // Keep hidden zip present for current backend
+    // Optional: set a state-coded dummy zip so analytics can group by state if needed
+    const byStateZip={AL:'35005',AK:'99501',AZ:'85001',AR:'72201',CA:'90001',CO:'80014',CT:'06103',DE:'19701',DC:'20001',FL:'33101',GA:'30301',HI:'96801',ID:'83701',IL:'60601',IN:'46201',IA:'50301',KS:'66101',KY:'40201',LA:'70112',ME:'04101',MD:'21201',MA:'02108',MI:'48201',MN:'55401',MS:'39201',MO:'63101',MT:'59001',NE:'68102',NV:'89101',NH:'03301',NJ:'07101',NM:'87501',NY:'10001',NC:'27601',ND:'58102',OH:'43215',OK:'73102',OR:'97201',PA:'15219',RI:'02903',SC:'29201',SD:'57104',TN:'37201',TX:'73301',UT:'84101',VT:'05602',VA:'23219',WA:'98101',WV:'25301',WI:'53202',WY:'82001'};
+    document.getElementById('state').addEventListener('change',(e)=>{
+      const z=byStateZip[e.target.value]||'99999';
+      document.getElementById('zipHidden').value=z;
+    });
+
+    document.getElementById('anon').addEventListener('change',(e)=>{
+      const f=document.getElementById('petitionForm');
+      let h=f.querySelector('input[name="anonymous"][type="hidden"]');
+      if(!h){h=document.createElement('input');h.type='hidden';h.name='anonymous';f.appendChild(h);} h.value=e.target.checked?'1':'0';
+    });
   </script>
 </body>
 </html>
