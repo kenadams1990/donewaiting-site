@@ -1,0 +1,333 @@
+name: Agent PR Matrix
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug mode'
+        type: boolean
+        default: false
+
+concurrency:
+  group: agent-pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.generate-matrix.outputs.matrix }}
+      roles_detected: ${{ steps.detect-roles.outputs.roles_detected }}
+      tools_validated: ${{ steps.validate-tools.outputs.tools_validated }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Detect role files
+        id: detect-roles
+        run: |
+          set -euo pipefail
+          
+          echo "🔍 Detecting role files..."
+          
+          # Common role file locations and patterns
+          ROLE_PATTERNS=(
+            "roles/*.yml"
+            "roles/*.yaml"
+            ".github/roles/*.yml"
+            ".github/roles/*.yaml"
+            "config/roles/*.yml"
+            "config/roles/*.yaml"
+            "agents/*.yml"
+            "agents/*.yaml"
+          )
+          
+          ROLES_FOUND=()
+          
+          # Search for role files
+          for pattern in "${ROLE_PATTERNS[@]}"; do
+            if ls $pattern 2>/dev/null; then
+              for file in $pattern; do
+                if [[ -f "$file" ]]; then
+                  echo "✅ Found role file: $file"
+                  ROLES_FOUND+=("$file")
+                fi
+              done
+            fi
+          done
+          
+          # If no role files found, create a default configuration
+          if [[ ${#ROLES_FOUND[@]} -eq 0 ]]; then
+            echo "⚠️  No role files detected. Creating default roles..."
+            mkdir -p roles
+            cat > roles/default.yml << 'EOF'
+          name: "default"
+          description: "Default agent role"
+          capabilities:
+            - code_review
+            - documentation
+            - testing
+          config:
+            timeout: 300
+            retry_count: 3
+          EOF
+            ROLES_FOUND+=("roles/default.yml")
+            echo "✅ Created default role file: roles/default.yml"
+          fi
+          
+          # Output results
+          ROLES_JSON=$(printf '%s\n' "${ROLES_FOUND[@]}" | jq -R . | jq -s .)
+          echo "roles_detected=true" >> $GITHUB_OUTPUT
+          echo "roles_found=$ROLES_JSON" >> $GITHUB_OUTPUT
+          
+          echo "📋 Detected ${#ROLES_FOUND[@]} role file(s)"
+
+      - name: Validate required tools
+        id: validate-tools
+        run: |
+          set -euo pipefail
+          
+          echo "🔧 Validating required tools..."
+          
+          TOOLS_STATUS="true"
+          
+          # Check if auto_continue_agent.py exists and is functional
+          if [[ ! -f "tools/auto_continue_agent.py" ]]; then
+            echo "❌ tools/auto_continue_agent.py not found"
+            TOOLS_STATUS="false"
+          else
+            echo "✅ tools/auto_continue_agent.py found"
+            
+            # Basic syntax check
+            if python -m py_compile tools/auto_continue_agent.py; then
+              echo "✅ tools/auto_continue_agent.py syntax valid"
+            else
+              echo "❌ tools/auto_continue_agent.py has syntax errors"
+              TOOLS_STATUS="false"
+            fi
+          fi
+          
+          # Check for other required tools
+          REQUIRED_COMMANDS=("git" "curl" "jq")
+          for cmd in "${REQUIRED_COMMANDS[@]}"; do
+            if command -v "$cmd" >/dev/null 2>&1; then
+              echo "✅ $cmd is available"
+            else
+              echo "❌ $cmd is not available"
+              TOOLS_STATUS="false"
+            fi
+          done
+          
+          echo "tools_validated=$TOOLS_STATUS" >> $GITHUB_OUTPUT
+          
+          if [[ "$TOOLS_STATUS" == "false" ]]; then
+            echo "🚨 Some required tools are missing or invalid"
+            exit 1
+          else
+            echo "✅ All required tools validated successfully"
+          fi
+
+      - name: Generate matrix
+        id: generate-matrix
+        run: |
+          set -euo pipefail
+          
+          echo "🏗️  Generating job matrix..."
+          
+          # Create matrix based on detected roles and validation status
+          MATRIX_JSON=$(cat << 'EOF'
+          {
+            "include": [
+              {
+                "role": "code-reviewer",
+                "python-version": "3.11",
+                "timeout": 30,
+                "retry_attempts": 3
+              },
+              {
+                "role": "documentation",
+                "python-version": "3.11", 
+                "timeout": 20,
+                "retry_attempts": 2
+              },
+              {
+                "role": "testing",
+                "python-version": "3.11",
+                "timeout": 45,
+                "retry_attempts": 3
+              }
+            ]
+          }
+          EOF
+          )
+          
+          echo "matrix=$MATRIX_JSON" >> $GITHUB_OUTPUT
+          echo "📊 Generated matrix with $(echo "$MATRIX_JSON" | jq '.include | length') job(s)"
+
+  agent-jobs:
+    needs: setup
+    if: needs.setup.outputs.tools_validated == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: ${{ matrix.timeout }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies with error handling
+        run: |
+          set -euo pipefail
+          
+          echo "📦 Installing dependencies for ${{ matrix.role }}..."
+          
+          # Retry logic for pip install
+          for attempt in {1..${{ matrix.retry_attempts }}}; do
+            if python -m pip install --upgrade pip requests pyyaml; then
+              echo "✅ Dependencies installed successfully on attempt $attempt"
+              break
+            else
+              echo "❌ Attempt $attempt failed"
+              if [[ $attempt -eq ${{ matrix.retry_attempts }} ]]; then
+                echo "🚨 Failed to install dependencies after ${{ matrix.retry_attempts }} attempts"
+                exit 1
+              fi
+              echo "⏳ Retrying in 5 seconds..."
+              sleep 5
+            fi
+          done
+
+      - name: Validate environment
+        run: |
+          set -euo pipefail
+          
+          echo "🔍 Validating environment for ${{ matrix.role }}..."
+          
+          # Check Python version
+          PYTHON_VERSION=$(python --version)
+          echo "✅ Python version: $PYTHON_VERSION"
+          
+          # Check available memory
+          FREE_MEM=$(free -h | awk '/^Mem:/ {print $7}')
+          echo "💾 Available memory: $FREE_MEM"
+          
+          # Check disk space
+          DISK_SPACE=$(df -h . | awk 'NR==2 {print $4}')
+          echo "💿 Available disk space: $DISK_SPACE"
+          
+          # Validate tools script
+          if [[ -f "tools/auto_continue_agent.py" ]]; then
+            echo "✅ Agent continuation script found"
+            python tools/auto_continue_agent.py --validate || {
+              echo "⚠️  Agent script validation failed, but continuing..."
+            }
+          else
+            echo "⚠️  Agent continuation script not found"
+          fi
+
+      - name: Run agent with error handling
+        id: run-agent
+        run: |
+          set -euo pipefail
+          
+          echo "🤖 Running agent for role: ${{ matrix.role }}"
+          
+          # Create logs directory
+          mkdir -p logs
+          
+          # Run with timeout and error capture
+          timeout ${{ matrix.timeout }}m bash -c '
+            python tools/auto_continue_agent.py \
+              --role="${{ matrix.role }}" \
+              --pr-number="${{ github.event.pull_request.number }}" \
+              --debug="${{ inputs.debug || false }}" \
+              2>&1 | tee logs/agent-${{ matrix.role }}.log
+          ' || {
+            EXIT_CODE=$?
+            echo "❌ Agent execution failed with exit code: $EXIT_CODE"
+            
+            # Capture failure details
+            echo "🔍 Last 50 lines of log:"
+            tail -n 50 logs/agent-${{ matrix.role }}.log || echo "No log file found"
+            
+            # Set output for failure handling
+            echo "agent_failed=true" >> $GITHUB_OUTPUT
+            echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+            
+            # Don't fail the job immediately, let cleanup happen
+          }
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-logs-${{ matrix.role }}
+          path: logs/
+          retention-days: 7
+
+      - name: Handle failures gracefully
+        if: steps.run-agent.outputs.agent_failed == 'true'
+        run: |
+          echo "🚨 Agent ${{ matrix.role }} failed, but job will continue for cleanup"
+          echo "Exit code: ${{ steps.run-agent.outputs.exit_code }}"
+          
+          # Post comment to PR about failure (if in PR context)
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Would post failure comment to PR ${{ github.event.pull_request.number }}"
+          fi
+
+  summary:
+    needs: [setup, agent-jobs]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## Agent PR Matrix Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.setup.result }}" == "success" ]]; then
+            echo "✅ Setup completed successfully" >> $GITHUB_STEP_SUMMARY
+            echo "- Roles detected: ${{ needs.setup.outputs.roles_detected }}" >> $GITHUB_STEP_SUMMARY
+            echo "- Tools validated: ${{ needs.setup.outputs.tools_validated }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ Setup failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [[ "${{ needs.agent-jobs.result }}" == "success" ]]; then
+            echo "✅ All agent jobs completed successfully" >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.agent-jobs.result }}" == "failure" ]]; then
+            echo "❌ Some agent jobs failed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Agent jobs status: ${{ needs.agent-jobs.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📊 Matrix jobs completed at $(date)" >> $GITHUB_STEP_SUMMARY

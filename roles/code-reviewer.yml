@@ -1,0 +1,25 @@
+name: "code-reviewer"
+description: "Automated code review agent"
+capabilities:
+  - code_analysis
+  - security_scan
+  - style_check
+  - documentation_review
+config:
+  timeout: 600
+  retry_count: 2
+  max_iterations: 5
+  error_threshold: 3
+  cooldown_seconds: 3
+  files_to_review:
+    - "*.js"
+    - "*.html"
+    - "*.css"
+    - "*.py"
+    - "*.yml"
+    - "*.yaml"
+  exclude_patterns:
+    - "node_modules/*"
+    - "dist/*"
+    - "build/*"
+    - ".git/*"
